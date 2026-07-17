@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TTU Cost Estimation System v6 — Oil India Limited</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <aside class="sb">
+    <div class="sb-brand">
+      <div class="sb-ico">TTU</div>
+      <div><div class="sb-name">TTU Estimator</div><div class="sb-ver">v6.0 · OIL India</div></div>
+    </div>
+    <div class="sb-proj">
+      <div class="sb-plbl">Active Project</div>
+      <div class="sb-pname" id="projName">New Project</div>
+      <div class="sb-ttype" id="projType">20MT</div>
+    </div>
+    <nav>
+      <div class="ng">
+        <div class="ngl">Overview</div>
+        <button class="ni active" data-page="dashboard"><span class="ni-i">📊</span>Main Dashboard</button>
+        <button class="ni" data-page="ttu"><span class="ni-i">🚛</span>TTU Dashboard</button>
+      </div>
+      <div class="ng">
+        <div class="ngl">Cost Components</div>
+        <button class="ni" data-page="labour"><span class="ni-i">👥</span>Labour / Wages</button>
+        <button class="ni" data-page="fuel"><span class="ni-i">⛽</span>Fuel</button>
+        <button class="ni" data-page="tyre"><span class="ni-i">🔵</span>Tyre &amp; Battery</button>
+        <button class="ni" data-page="maintenance"><span class="ni-i">⚙️</span>Maintenance</button>
+        <button class="ni" data-page="insurance"><span class="ni-i">🛡</span>Insurance</button>
+        <button class="ni" data-page="tax"><span class="ni-i">🏛</span>Road Tax &amp; Permit</button>
+        <button class="ni" data-page="accessories"><span class="ni-i">🔧</span>Accessories</button>
+      </div>
+      <div class="ng">
+        <div class="ngl">Used Vehicle</div>
+        <button class="ni" data-page="vintage"><span class="ni-i">🕰</span>Vintage TTU Dashboard</button>
+      </div>
+      <div class="ng">
+        <div class="ngl">Tools</div>
+        <button class="ni" data-page="formula"><span class="ni-i">〈/〉</span>Formula Viewer</button>
+        <button class="ni" data-page="reports"><span class="ni-i">📄</span>Reports</button>
+        <button class="ni" data-page="projects"><span class="ni-i">📁</span>Projects</button>
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <button class="sb-btn" id="themeBtn">☀️ Light Mode</button>
+      <button class="sb-btn" onclick="UI.showDefaultsMenu()">⚙️ Defaults</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-l"><div class="pg-title" id="pageTitle">Main Dashboard</div></div>
+      <div class="tb-r">
+        <div class="srch"><span class="srch-i">🔍</span><input type="text" id="searchBox" placeholder="Search inputs…"></div>
+        <button class="tbtn" onclick="UI.newProject()">➕ New</button>
+        <button class="tbtn" onclick="DB.save().then(()=>UI.toast('Saved','💾'))">💾 Save</button>
+        <button class="tbtn" onclick="Exp.csv()">⬇️ CSV</button>
+        <button class="tbtn" onclick="Exp.exportSection()" title="Export only the current module as a multi-page PDF">🖨️ Export Section</button>
+        <button class="tbtn" onclick="Exp.fullReport()" title="Export the complete project report (all modules) as a multi-page PDF">📑 Full Report</button>
+        <div class="save-st"><div class="save-dot" id="saveDot"></div><span id="saveLabel">Saved</span></div>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+
+<div id="fullReportPrint"></div>
+<div id="toasts"></div>
+<div id="mo">
+  <div class="modal">
+    <div class="mh"><h3 id="mo-title"></h3><button class="mc" onclick="UI.hideModal()">×</button></div>
+    <div class="mb2" id="mo-body"></div>
+    <div class="mf" id="mo-foot"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
