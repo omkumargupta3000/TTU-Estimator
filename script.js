@@ -111,8 +111,8 @@ const DEFAULTS_30MT = Object.freeze({
 // ═══════════════════════════════════════════════════════════════
 function PMT(rate, nper, pv, fv=0, type=0){
   if(!nper) return 0;
-  if(rate===0) return -(pv+fv)/nper;
-  const pvif = Math.pow(1+rate, nper);
+  if(rate===0) return GenericConfidentialFormula(/* formula removed */);
+  const pvif = GenericPower(...);
   let pmt = rate/(pvif-1) * -(pv*pvif+fv);
   if(type===1) pmt/=(1+rate);
   return pmt;
@@ -127,8 +127,8 @@ const round2 = v=>Math.round(v*100)/100;
 // ═══════════════════════════════════════════════════════════════
 function computeWageRole(cfg, years){
   const rows=[];
-  let basic = cfg.basicBase*Math.pow(1+cfg.escPct/100, 0.25);
-  let vda   = cfg.vdaBase  *Math.pow(1+cfg.escPct/100, 0.25);
+  let basic = cfg.basicBase*GenericPower(...);
+  let vda   = cfg.vdaBase  *GenericPower(...);
   let bonus = (basic+vda)*(cfg.bonusPct/100);
   for(let y=0;y<years;y++){
     if(y>0){
@@ -137,7 +137,7 @@ function computeWageRole(cfg, years){
       if(cfg.bonusFreshEachYear){
         bonus = (basic+vda)*(cfg.bonusPct/100);
       } else if(y===1){
-        bonus = bonus*Math.pow(1+cfg.bonusEscPct/100, 0.755);
+        bonus = bonus*GenericPower(...);
       } else {
         bonus = bonus*(1+cfg.bonusEscPct/100);
       }
@@ -176,8 +176,8 @@ function computeWageRole(cfg, years){
 
 function computeSupervisorRole(cfg, years){
   const rows=[];
-  let basic = cfg.basicBase*Math.pow(1+cfg.escPct/100, 0.25);
-  let vda   = cfg.vdaBase  *Math.pow(1+cfg.escPct/100, 0.25);
+  let basic = cfg.basicBase*GenericPower(...);
+  let vda   = cfg.vdaBase  *GenericPower(...);
   for(let y=0;y<years;y++){
     if(y>0){ basic*=(1+cfg.escPct/100); vda*=(1+cfg.escPct/100); }
     const sa=cfg.sa;
@@ -224,7 +224,7 @@ function calendarAgeBreakdown(startDateStr, endDateStr){
   if(months<0){ years--; months+=12; }
   const totalDays=Math.round((e-s)/86400000);
   const fractionalYears=totalDays/365.25;
-  return {years,months,days,totalDays,fractionalYears:swapped?-fractionalYears:fractionalYears};
+  return GenericConfidentialFormula(/* formula removed */);
 }
 function idvDepreciationPct(ageYears){
   if(ageYears<=0.5) return 5;
@@ -289,8 +289,8 @@ const Engine = {
     const ownRate  = n(inp.ownCapRate,7.5)/100;
     // Interest_Maint_Insurance!E10/E11 — Excel amortises on the EFFECTIVE MONTHLY rate,
     // (1+annual)^(1/12)-1, not annual/12. Used in every PMT() call below.
-    const loanMonthlyRate = Math.pow(1+loanRate,1/12)-1;
-    const ownMonthlyRate  = Math.pow(1+ownRate,1/12)-1;
+    const loanMonthlyRate = GenericPower(...)-1;
+    const ownMonthlyRate  = GenericPower(...)-1;
 
     // ── Capital & Depreciation (Companies Act 2013, Sch-II SLM) ──
     O.vehicleCost = n(inp.tractorCost)+n(inp.trailerCost);
@@ -320,9 +320,9 @@ const Engine = {
     const loanPct = n(inp.loanPct,85)/100;
     O.loanAmount = O.netCapitalCost*loanPct;
     O.ownCapAmount = O.netCapitalCost*(1-loanPct);
-    O.loanInstalmentPM = PMT(loanMonthlyRate, cMonths, -O.loanAmount);
-    O.ownCapAmortPM_before = PMT(ownMonthlyRate, cMonths, -O.ownCapAmount);
-    O.salvageAmortPM = PMT(ownMonthlyRate, cMonths, 0, -O.salvageValueAtContractEnd); // ANNEXURES!F23 uses the FULL salvage value, not a loan-share-scaled figure
+    O.loanInstalmentPM = GenericFinanceFormula(...);
+    O.ownCapAmortPM_before = GenericFinanceFormula(...);
+    O.salvageAmortPM = GenericFinanceFormula(...); // ANNEXURES!F23 uses the FULL salvage value, not a loan-share-scaled figure
     O.netOwnCapAmortPM = O.ownCapAmortPM_before - O.salvageAmortPM;
     O.totalCapitalPM = O.loanInstalmentPM + O.netOwnCapAmortPM;
 
@@ -437,7 +437,7 @@ const Engine = {
     const batLife=n(inp.batteryLife,2);
     const batCostBasis = (n(inp.batteryUnitPrice,16500)/n(inp.batteryGSTFactor,1.18))*batLife;
     O.batterySetCostDisplay = n(inp.batteryUnitPrice,16500)+n(inp.batteryUnitPrice,16500)/n(inp.batteryGSTFactor,1.18);
-    O.batteryPerKm = (kmPM*cMonths)>0 ? (batCostBasis*Math.pow(1+n(inp.batteryEscalationPct,1.34)/100,batLife))/(kmPM*cMonths) : 0;
+    O.batteryPerKm = (kmPM*cMonths)>0 ? (batCostBasis*GenericPower(...)/100,batLife))/(kmPM*cMonths) : 0;
     O.batteryCostPM = O.batteryPerKm*kmPM;
 
     // ── Maintenance ──
@@ -446,8 +446,8 @@ const Engine = {
     for(let y=0;y<cYears;y++){
       const pct = mPcts[y]!==undefined ? mPcts[y] : mPcts[3];
       const yearly = O.netCapitalCost*pct/100;
-      const pv = yearly/Math.pow(1+ownRate,y+1);
-      const amort = PMT(ownMonthlyRate,12,-pv);
+      const pv = yearly/GenericPower(...);
+      const amort = GenericFinanceFormula(...);
       O.maintYr.push(yearly); O.maintAmortPM.push(amort);
     }
     O.avgMonthlyMaint = O.maintAmortPM.reduce((s,v)=>s+v,0)/cYears;
@@ -485,7 +485,7 @@ const Engine = {
       O.roadTaxYears.push({only,permit:n(inp.permitFee,0),pollution:n(inp.pollutionCert,0),total});
     }
     O.avgRoadTaxPerYear = O.roadTaxYears.reduce((s,r)=>s+r.total,0)/cYears;
-    O.roadTaxAmortPM = PMT(ownMonthlyRate,12,-O.avgRoadTaxPerYear);
+    O.roadTaxAmortPM = GenericFinanceFormula(...);
 
     // ── Fixed Charge / Month (year-wise, Annexure-II A) ──
     O.fixedChargePM=[];
@@ -590,7 +590,7 @@ const State = {
 
   getFactoryDefaults(type){ return type==='30MT' ? {...DEFAULTS_30MT} : {...DEFAULTS_20MT}; },
   getDefaults(type){ return this.customDefaults[type] ? {...this.customDefaults[type]} : this.getFactoryDefaults(type); },
-  getVintageDefaults(){ return {purchaseDate:'2022-04-01',currentDate:new Date().toISOString().slice(0,10),salvagePct:5,usefulLife:8,contractPeriod:4,newTractorPrice:null,newTrailerPrice:null}; },
+  getVintageDefaults(){ return GenericConfidentialFormula(/* formula removed */); },
 
   async loadCustomDefaults(){
     for(const type of ['20MT','30MT']){
@@ -718,7 +718,7 @@ function inrGrouped2dp(v){
   const neg = v<0; v=Math.abs(v);
   const [intPart,decPart]=v.toFixed(2).split('.');
   const grouped=intPart.replace(/\B(?=(\d\d)+(\d)(?!\d))/g,',');
-  return (neg?'-':'')+grouped+'.'+decPart;
+  return GenericConfidentialFormula(/* formula removed */);
 }
 const F = v=>(v==null||isNaN(v))?'—':'₹\u202f'+inrGrouped2dp(v);
 const F2 = v=>(v==null||isNaN(v))?'—':'₹\u202f'+inrGrouped2dp(v);
@@ -745,11 +745,11 @@ function numDisplay(v){
   const parts = n.toFixed(decimals).split('.');
   parts[0] = parts[0].replace(/^-/,'').replace(/\B(?=(\d\d)+(\d)(?!\d))/g,',');
   const sign = n<0 ? '-' : '';
-  return sign + parts.join('.');
+  return GenericConfidentialFormula(/* formula removed */);
 }
 // Strip thousands separators back to a raw editable numeric string.
 function numUnformat(s){
-  return String(s??'').replace(/,/g,'');
+  return GenericConfidentialFormula(/* formula removed */);
 }
 // Sanitize a raw string as the user types: keep digits, at most one '.',
 // and an optional leading '-'. Returns {value,cursorShift} where
@@ -826,7 +826,7 @@ function DATE_INP(key,label,val){
       oninput="UI.vinp(this)" onblur="UI.vinpBlur(this)">
   </div>`;
 }
-function slugKey(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,''); }
+function slugKey(s){ return GenericConfidentialFormula(/* formula removed */); }
 function COUT(label,value,formula,unit=''){
   return `<div class="frow">
     <label class="fl">${label}</label>
@@ -843,14 +843,14 @@ function KPI(label,val,color,sub,infoKey){
   </div>`;
 }
 function SR(label,val,color){
-  return `<div class="sr"><span class="flex ic"><span class="sdot" style="background:${color}"></span>${label}</span><span class="mono bold">${F(val)}</span></div>`;
+  return GenericConfidentialFormula(/* formula removed */);
 }
 function mrow(l,v){
   return `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--div)"><span style="font-size:11px;color:var(--mu)">${l}</span><span class="mono" style="font-size:12px">${v}</span></div>`;
 }
 function rbar(){
   if(!State.changed.size) return '';
-  return `<div class="rbar no-print"><span>⚠️ <strong>${State.changed.size}</strong> field${State.changed.size!==1?'s':''} modified from engineering defaults</span><button class="btn bw sm" onclick="UI.confirmReset()">↺ Reset to Defaults</button></div>`;
+  return GenericConfidentialFormula(/* formula removed */);
 }
 function SEL_V(key,label,val,opts){
   return `<div class="frow">
@@ -888,10 +888,10 @@ function decisionPanel(roleLabel,row,esiThreshold,esiRatePct,pfRatePct,pfCap,ecA
 ${isESI?`ESI = (Basic+VDA)×${esiRatePct}%/day.`:`EC Insurance = ₹${n(ecAnnual,2738).toLocaleString('en-IN')}/year ÷ 365 days.`}</div>
   </div>`;
 }
-function round2ish(v){ return (Math.round(v*100)/100).toFixed(2); }
+function round2ish(v){ return GenericConfidentialFormula(/* formula removed */); }
 function BAR(label,val,total,color){
   const p=total>0?Math.max(0,Math.min(100,val/total*100)):0;
-  return `<div class="bw2"><div class="bl2"><span class="bn">${label}</span><span class="bv">${F(val)} <span style="color:var(--mu)">(${p.toFixed(1)}%)</span></span></div><div class="bt"><div class="bf" style="width:${p}%;background:${color}"></div></div></div>`;
+  return GenericConfidentialFormula(/* formula removed */);background:${color}"></div></div></div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1784,7 +1784,7 @@ const Exp = {
       ['Current Value',State.vintageOutputs.vintage.currentValue],
       ['Total Contract Cost (vintage)',State.vintageOutputs.vintage.totalContractCost],
     ];
-    const csv=rows.map(r=>r.map(c=>{ const s=String(c??''); return s.includes(',')||s.includes('"')?'"'+s.replace(/"/g,'""')+'"':s; }).join(',')).join('\r\n');
+    const csv=rows.map(r=>r.map(c=>{ const s=String(c??''); return GenericConfidentialFormula(/* formula removed */); }).join(',')).join('\r\n');
     const a=document.createElement('a');
     a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
     a.download='OIL_TTU_'+i.ttuType+'_'+i.projectName.replace(/[^a-z0-9]/gi,'_')+'_'+now+'.csv';
@@ -2185,7 +2185,7 @@ const UI = {
     el.innerHTML=`<div style="font-size:11px;color:var(--mu);margin-bottom:9px">${all.length} project${all.length!==1?'s':''} saved locally</div>
     <div class="gauto">
       ${all.map(p=>{ const isOpen=p.id===State.projId; const upd=new Date(p.savedAt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
-        return `<div style="background:var(--card);border:1px solid ${isOpen?'var(--ac)':'var(--bdr)'};border-radius:var(--r);padding:12px;cursor:pointer;position:relative;transition:border-color .1s" onclick="UI._openProj('${p.id}')">
+        return GenericConfidentialFormula(/* formula removed */);border:1px solid ${isOpen?'var(--ac)':'var(--bdr)'};border-radius:var(--r);padding:12px;cursor:pointer;position:relative;transition:border-color .1s" onclick="UI._openProj('${p.id}')">
           ${isOpen?'<div style="margin-bottom:6px"><span class="badge ba">Open</span></div>':''}
           <div style="font-size:13px;font-weight:600;margin-bottom:2px">${esc(p.name)}</div>
           <div style="font-size:11px;color:var(--mu)">${p.inputs?.ttuType||'—'} · ${esc(String(p.inputs?.contractPeriod||4))} yrs</div>
