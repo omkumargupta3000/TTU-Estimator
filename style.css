@@ -1,3 +1,4 @@
+<style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0b1623;--surf:#0f1e30;--card:#132337;--inp:#0a1520;--hov:#19304a;
@@ -195,3 +196,4 @@ tbody tr:hover td{background:var(--hov)}
   body.printing-full .content{display:none!important}
   @page{size:A4 landscape;margin:12mm}
 }
+</style>
